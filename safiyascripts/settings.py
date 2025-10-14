@@ -25,7 +25,15 @@ SECRET_KEY = 'django-insecure-n-8g8apjjt(3)fe_qi+h%_gbsdh_$mx*csy0y*88twwm&e8^n=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'safiyascripts.onrender.com',
+    'safiyascripts.com',
+    'www.safiyascripts.com',
+    '.onrender.com', 
+    'localhost', 
+    '127.0.0.1'
+]
+
 
 
 # Application definition
@@ -64,6 +72,7 @@ LOGOUT_REDIRECT_URL = 'account:logout'
 
 # Prevent caching of secure pages globally
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 import os
 from pathlib import Path
 
@@ -92,8 +101,6 @@ MIDDLEWARE = [
 
 # Tell Django to compress static files for production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 ROOT_URLCONF = 'safiyascripts.urls'
 
