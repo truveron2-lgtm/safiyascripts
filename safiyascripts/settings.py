@@ -26,13 +26,13 @@ SECRET_KEY = 'django-insecure-n-8g8apjjt(3)fe_qi+h%_gbsdh_$mx*csy0y*88twwm&e8^n=
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
     'safiyascripts.onrender.com',
     'safiyascripts.com',
     'www.safiyascripts.com',
-    '.onrender.com', 
-    'localhost', 
-    '127.0.0.1'
 ]
+
 
 
 
