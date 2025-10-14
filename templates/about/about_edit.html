@@ -1,0 +1,16 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Edit About Us | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Edit About Us</h2>
+    <div class="card p-4 shadow-sm">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary mt-3">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

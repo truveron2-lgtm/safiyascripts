@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Faith | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Faith Reflections</h1>
+    <div class="card shadow-sm p-4">
+        {% if text %}
+            <h3>{{ text.title }}</h3>
+            <p class="lead">{{ text.content|linebreaks }}</p>
+        {% else %}
+            <p class="text-center text-muted">No faith reflections available yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

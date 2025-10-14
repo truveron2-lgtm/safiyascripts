@@ -1,0 +1,114 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Statistics Dashboard | SafiyaScripts{% endblock %}
+
+{% block extra_css %}
+<style>
+/* General container spacing */
+.container {
+    max-width: 1200px;
+}
+
+/* Card styling */
+.card {
+    border: 1px solid #e0d9f2;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    background-color: #faf5ff;
+}
+.card:hover {
+    transform: translateY(-3px);
+}
+
+/* Card headings */
+.card h4 {
+    color: #4b0082; /* Mature purple */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Numbers display */
+.display-5 {
+    font-weight: bold;
+    color: #6a0dad; /* Subtle purple accent */
+}
+
+/* Lists */
+.list-group-item {
+    border: 1px solid #e0d9f2;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background-color: #fffafc;
+}
+
+/* Badge colors */
+.badge.bg-primary {
+    background-color: #6a0dad;
+}
+.badge.bg-success {
+    background-color: #9c27b0; /* Slightly different purple for contrast */
+}
+
+/* Headings for sections */
+h2, h4 {
+    color: #4b0082;
+}
+
+/* Minimal spacing */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Site Statistics</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h4>Total Visitors</h4>
+                <p class="display-5">{{ total_visitors }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h4>Total Page Views</h4>
+                <p class="display-5">{{ total_page_views }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h4>Visitors by Country</h4>
+            <ul class="list-group">
+                {% for c in visitors_by_country %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ c.country|default:"Unknown" }}
+                        <span class="badge bg-primary rounded-pill">{{ c.count }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No data available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Most Visited Pages</h4>
+            <ul class="list-group">
+                {% for p in most_visited_pages %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ p.page_name }}
+                        <span class="badge bg-success rounded-pill">{{ p.count }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No data available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

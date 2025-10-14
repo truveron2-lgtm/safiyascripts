@@ -1,0 +1,44 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Faith Texts | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Faith Texts</h2>
+        <a href="{% url 'faith:faith_add' %}" class="btn btn-success">Add Faith Text</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Active</th>
+                <th>Author</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for text in texts %}
+            <tr>
+                <td>{{ text.title }}</td>
+                <td>{% if text.active %}Yes{% else %}No{% endif %}</td>
+                <td>{{ text.author.username }}</td>
+                <td>
+                    <a href="{% url 'faith:faith_public' %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'faith:faith_edit' text.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <form method="POST" action="{% url 'faith:faith_delete' text.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No faith texts available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

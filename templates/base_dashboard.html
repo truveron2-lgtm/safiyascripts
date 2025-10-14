@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SafiyaScripts | Christian Reflections Blog{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== Global Styles ===== */
+    body {
+      background-color: #ffffff;
+      font-family: 'Raleway', sans-serif;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== Navbar ===== */
+    .navbar {
+      background-color: #6A0DAD; /* Purple background */
+      padding: 1rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff !important; /* White logo text */
+      letter-spacing: 1px;
+    }
+
+    .nav-link {
+      color: #fff !important; /* White text */
+      font-weight: 500;
+      margin: 0 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background-color: #001F7E !important; /* Dark blue hover */
+      color: #fff !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* ===== Logout Button ===== */
+    .logout-link {
+      background-color: transparent;
+      border: 1px solid #fff;
+    }
+
+    .logout-link:hover {
+      background-color: #001F7E !important;
+      color: #fff !important;
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      flex: 1;
+      padding: 60px 0;
+    }
+
+    .content-wrapper {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 40px;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      background-color: #6A0DAD;
+      text-align: center;
+      padding: 25px 10px;
+      font-size: 0.9rem;
+      color: #fff;
+      margin-top: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">SafiyaScripts</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="{% url 'account:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main>
+    <div class="container">
+      {% block content %}
+      <div class="content-wrapper text-center">
+        <h1>Welcome to SafiyaScripts</h1>
+        <p>Faith, inspiration, and reflections to guide your journey.</p>
+      </div>
+      {% endblock %}
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    © 2025 SafiyaScripts — Powered by VirtualPot — “Let your light so shine before men” (Matthew 5:16)
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+{% extends "base_admin.html" %}
+{% block content %}
+<div class="container mt-4">
+
+  <!-- ✅ Display messages -->
+  {% if messages %}
+    <div class="mt-3">
+      {% for message in messages %}
+        <div 
+          class="alert 
+          {% if message.tags == 'error' %}alert-danger text-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}
+          alert-dismissible fade show shadow-sm" 
+          role="alert">
+          {{ message|safe }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2>{{ article.title }}</h2>
+  <p class="text-muted">By {{ article.author.username }} | {{ article.date_posted|date:"M d, Y" }}</p>
+  
+  {% if article.image %}
+    <img src="{{ article.image.url }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
+  {% endif %}
+
+  <hr>
+  <p>{{ article.full_description|linebreaks }}</p>
+
+  {% if user == article.author %}
+    <a href="{% url 'articles:article_edit' article.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'articles:article_delete' article.pk %}" class="btn btn-danger">Delete</a>
+  {% endif %}
+
+  <a href="{% url 'articles:article_list' %}" class="btn btn-secondary mt-3">← Back to Articles</a>
+
+  <hr class="my-5">
+
+  <h4>Comments</h4>
+  <div class="mt-3">
+    {% for comment in comments %}
+      <div class="border p-3 mb-3 rounded bg-light">
+        <p>
+          <strong>{{ comment.name }}</strong> 
+          <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+        </p>
+        <p>{{ comment.content }}</p>
+
+        {% if user.is_authenticated %}
+          <!-- ✅ Only logged-in users can reply -->
+          <a href="#" class="reply-link text-primary" data-comment="{{ comment.id }}">Reply</a>
+        {% else %}
+          <small class="text-muted">Login to reply to comments.</small>
+        {% endif %}
+
+        {% if user.is_authenticated and user == comment.user %}
+          <a href="{% url 'articles:delete_comment' comment.id %}" class="text-danger ms-3">Delete</a>
+        {% endif %}
+
+        <!-- ✅ Display replies -->
+        {% for reply in comment.replies.all %}
+          <div class="ms-4 mt-2 border-start ps-3">
+            <p>
+              <strong>{{ reply.name }}</strong> 
+              <small class="text-muted">{{ reply.created_at|date:"M d, Y H:i" }}</small>
+            </p>
+            <p>{{ reply.content }}</p>
+            {% if user.is_authenticated and user == reply.user %}
+              <a href="{% url 'articles:delete_comment' reply.id %}" class="text-danger">Delete</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% empty %}
+      <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+  </div>
+
+  <hr>
+  <h5>Leave a Comment</h5>
+
+  <form method="post" class="mt-3" id="comment-form">
+    {% csrf_token %}
+    {% if not user.is_authenticated %}
+      <div class="row">
+        <div class="col-md-6 mb-2">
+          <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+        </div>
+        <div class="col-md-6 mb-2">
+          <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+        </div>
+      </div>
+    {% endif %}
+
+    {{ comment_form.content }}
+    <input type="hidden" name="parent_id" id="parent_id">
+
+    <div class="form-check mt-2">
+      <input class="form-check-input" type="checkbox" name="subscribe" id="subscribe">
+      <label class="form-check-label" for="subscribe">
+        Subscribe to our newsletter
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Post Comment</button>
+  </form>
+</div>
+
+<!-- ✅ Script for replies (only for logged-in users) -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(alert => {
+    setTimeout(() => {
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }, 4000);
+  });
+
+  // ✅ Allow reply only for authenticated users
+  {% if user.is_authenticated %}
+  document.querySelectorAll('.reply-link').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const parentId = btn.getAttribute('data-comment');
+      document.getElementById('parent_id').value = parentId;
+      window.scrollTo({ 
+        top: document.getElementById('comment-form').offsetTop, 
+        behavior: 'smooth' 
+      });
+    });
+  });
+  {% endif %}
+});
+</script>
+{% endblock %}

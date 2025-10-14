@@ -1,0 +1,51 @@
+{% extends "base_admin.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Articles</h2>
+
+  <form method="get" class="mb-3">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search article..."
+           class="form-control w-50 d-inline">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  {% if user.is_authenticated %}
+    <a href="{% url 'articles:article_create' %}" class="btn btn-success mb-3">+ New Article</a>
+  {% endif %}
+
+  {% for article in articles %}
+    <div class="card mb-3 shadow-sm">
+      <div class="row g-0">
+        {% if article.image %}
+        <div class="col-md-3">
+          <img src="{{ article.image.url }}" class="img-fluid rounded-start" alt="{{ article.title }}">
+        </div>
+        {% endif %}
+        <div class="col-md-9">
+          <div class="card-body">
+            <h4><a href="{% url 'articles:article_detail' article.pk %}">{{ article.title }}</a></h4>
+            <p>{{ article.short_description }}</p>
+            <small class="text-muted">
+              By {{ article.author.username }} | {{ article.date_posted|date:"M d, Y" }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No articles found.</p>
+  {% endfor %}
+
+  <div class="pagination mt-4">
+    {% if articles.has_previous %}
+      <a href="?page={{ articles.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+         class="btn btn-outline-primary">Previous</a>
+    {% endif %}
+    <span class="mx-2">Page {{ articles.number }} of {{ articles.paginator.num_pages }}</span>
+    {% if articles.has_next %}
+      <a href="?page={{ articles.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+         class="btn btn-outline-primary">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

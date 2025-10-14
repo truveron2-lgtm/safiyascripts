@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Books | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-4">Our Published Books</h1>
+  <p class="text-center text-muted mb-5">
+    Welcome to our collection of published works. Here, we share books that inspire, enlighten, and transform lives.
+  </p>
+
+  <div class="row g-4">
+    {% for book in books %}
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 250px; object-fit: cover;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text">{{ book.description|truncatewords:25 }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">No books published yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

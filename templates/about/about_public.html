@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">About Us</h1>
+    <div class="card shadow-sm p-4">
+        {% if about %}
+            <p class="lead">{{ about.content|linebreaks }}</p>
+        {% else %}
+            <p class="text-center text-muted">No information available yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

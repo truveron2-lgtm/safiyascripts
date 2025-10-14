@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center text-primary mb-4">Latest Articles</h2>
+
+  <form method="get" class="mb-4 text-center">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search articles..."
+           class="form-control w-50 d-inline-block">
+    <button type="submit" class="btn btn-primary ms-2">Search</button>
+  </form>
+
+  <div class="row">
+    {% for article in articles %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          {% if article.image %}
+            <img src="{{ article.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+          {% else %}
+            <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+              <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ article.title }}</h5>
+            <p class="text-muted small">{{ article.date_posted|date:"M d, Y" }}</p>
+            <p>{{ article.short_description|truncatewords:20 }}</p>
+            <a href="{% url 'articles:article_detail_public' article.pk %}" class="btn btn-outline-primary btn-sm">
+              Read More →
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center text-muted">No articles found.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-4 text-center">
+    {% if articles.has_previous %}
+      <a href="?page={{ articles.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>
+    {% endif %}
+    <span class="mx-2">Page {{ articles.number }} of {{ articles.paginator.num_pages }}</span>
+    {% if articles.has_next %}
+      <a href="?page={{ articles.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

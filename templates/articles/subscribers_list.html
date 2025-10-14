@@ -1,0 +1,68 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Subscribers | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Newsletter Subscribers</h2>
+
+    {% if subscribers %}
+        <div class="card shadow-sm">
+            <div class="card-body table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>Date Subscribed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscriber in subscribers %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ subscriber.email }}</td>
+                            <td>{{ subscriber.created_at|date:"M d, Y h:i A" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    {% if subscribers.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ subscribers.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Page {{ subscribers.number }} of {{ subscribers.paginator.num_pages }}
+                        </span>
+                    </li>
+                    {% if subscribers.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ subscribers.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-4">
+            No subscribers yet.
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'articles:article_list' %}" class="btn btn-secondary">
+            ← Back to Articles
+        </a>
+    </div>
+</div>
+{% endblock %}

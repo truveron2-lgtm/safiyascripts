@@ -1,0 +1,24 @@
+<!-- ===== ARTICLES ===== --> 
+<h2 class="section-title">Recent Reflections</h2>
+<div class="container mb-5">
+  <div class="row g-4">
+    {% for article in recent_articles %}
+      <div class="col-md-4">
+        <div class="card article-card h-100 shadow-sm border-0">
+          <div class="card-body">
+            {% if article.image %}
+              <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-fluid rounded mb-3 float-start me-3" style="width: 80px; height: 80px; object-fit: cover;">
+            {% endif %}
+            <h5 class="card-title">{{ article.title }}</h5>
+            <p class="card-text">
+              {{ article.short_description|truncatechars:150 }}
+            </p>
+            <a href="{% url 'articles:article_detail_public' article.pk %}" class="btn btn-outline-primary btn-sm">Read More</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">No reflections available yet.</p>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,94 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Add Book | SafiyaScripts{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Center the form and limit max width */
+  .card form {
+      max-width: 600px;
+      margin: 0 auto;
+  }
+
+  /* Space between form fields */
+  .card form p {
+      margin-bottom: 1.5rem; /* more space between fields */
+  }
+
+  /* Labels styling */
+  .card form label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #333;
+  }
+
+  /* Inputs, textarea, file input styling */
+  .card form input[type="text"],
+  .card form textarea,
+  .card form input[type="file"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .card form input[type="text"]:focus,
+  .card form textarea:focus,
+  .card form input[type="file"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+      outline: none;
+  }
+
+  .card form textarea {
+      min-height: 150px;
+      resize: vertical;
+  }
+
+  /* Submit button styling */
+  .card form button {
+      display: block;
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+  }
+
+  .card form button:hover {
+      background-color: #0056b3;
+      color: #fff;
+  }
+
+  /* Card styling */
+  .card {
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  /* Page header */
+  .container h2 {
+      font-weight: 700;
+      color: #212529;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="text-center mb-5">Add a New Book</h2>
+  <div class="card">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary mt-3">Save Book</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

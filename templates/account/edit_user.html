@@ -1,0 +1,14 @@
+{% extends "base_admin.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h3 class="text-center text-primary mb-4">Edit User: {{ user_obj.username }}</h3>
+
+  <form method="post" enctype="multipart/form-data" class="shadow p-4 bg-white rounded">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    <button type="submit" class="btn btn-success mt-3">Save Changes</button>
+    <a href="{% url 'account:user_list' %}" class="btn btn-secondary mt-3">Cancel</a>
+  </form>
+</div>
+{% endblock %}
