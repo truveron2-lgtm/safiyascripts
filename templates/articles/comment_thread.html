@@ -1,0 +1,28 @@
+<div class="border rounded p-3 mb-3" id="comment-{{ comment.id }}">
+  <p><strong>{{ comment.name }}</strong> <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small></p>
+  <p>{{ comment.content|linebreaks }}</p>
+
+  <a href="#" class="text-primary small reply-link" data-comment="{{ comment.id }}">
+    💬 Reply
+  </a>
+
+  <!-- ✅ Hidden reply form (appears dynamically on click) -->
+  <div class="reply-form mt-3 d-none" id="reply-form-{{ comment.id }}">
+    <form method="post" action="" class="reply-comment-form">
+      {% csrf_token %}
+      <input type="hidden" name="parent_id" value="{{ comment.id }}">
+      {{ comment_form.content }}
+      <button type="submit" class="btn btn-sm btn-success mt-2">Post Reply</button>
+      <button type="button" class="btn btn-sm btn-outline-danger mt-2 cancel-reply">Cancel</button>
+    </form>
+  </div>
+
+  <!-- ✅ Render child comments recursively -->
+  {% if comment.replies.all %}
+    <div class="ms-4 mt-3 border-start ps-3">
+      {% for reply in comment.replies.all %}
+        {% include "articles/comment_thread.html" with comment=reply %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -24,7 +24,10 @@ def article_list(request):
     return render(request, 'articles/article_list.html', context)
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from .models import Article, Comment, Subscriber
+from .forms import CommentForm
 
 def article_detail(request, pk):
     article = get_object_or_404(Article, pk=pk)
@@ -37,23 +40,22 @@ def article_detail(request, pk):
             parent_id = request.POST.get('parent_id')
             parent_comment = Comment.objects.filter(id=parent_id).first() if parent_id else None
 
-            # ✅ Create comment object
+            # ✅ Create comment
             comment = comment_form.save(commit=False)
             comment.article = article
             comment.parent = parent_comment
 
-            # ✅ Allow only logged-in users to reply
+            # ✅ Only logged-in users can reply
             if parent_comment and not request.user.is_authenticated:
-                messages.error(request, "You must be logged in to reply to a comment.")
+                messages.error(request, "You must be logged in to reply.")
                 return redirect('articles:article_detail', pk=article.pk)
 
-            # ✅ Logged-in user info
+            # ✅ User handling
             if request.user.is_authenticated:
                 comment.user = request.user
                 comment.name = request.user.username
                 comment.email = request.user.email
             else:
-                # Non-logged visitors can only post top-level comments
                 if parent_comment:
                     messages.error(request, "Only logged-in users can reply to comments.")
                     return redirect('articles:article_detail', pk=article.pk)
@@ -65,10 +67,9 @@ def article_detail(request, pk):
             # ✅ Optional subscription
             if request.POST.get('subscribe') and comment.email:
                 Subscriber.objects.get_or_create(email=comment.email)
-                messages.success(request, "Thank you for subscribing to our newsletter!")
+                messages.success(request, "Thanks for subscribing!")
 
-            messages.success(
-                request,
+            messages.success(request, 
                 "Your reply has been posted." if parent_comment else "Your comment has been posted."
             )
             return redirect('articles:article_detail', pk=article.pk)
@@ -277,3 +278,37 @@ def article_summary_home(request):
     recent_articles = Article.objects.all()[:3]
     context = {'recent_articles': recent_articles}
     return render(request, 'articles/article_summary_home.html', context)
+
+
+@login_required
+def admin_reply_comment(request, pk):
+    """Allow admin to reply to a comment directly from the admin article detail view."""
+    article = get_object_or_404(Article, pk=pk)
+
+    if request.method == 'POST':
+        parent_id = request.POST.get('parent_id')
+        content = request.POST.get('content', '').strip()
+
+        if not parent_id or not content:
+            messages.error(request, "Invalid reply. Please write something.")
+            return redirect('articles:article_detail', pk=article.pk)
+
+        parent_comment = Comment.objects.filter(id=parent_id).first()
+        if not parent_comment:
+            messages.error(request, "Parent comment not found.")
+            return redirect('articles:article_detail', pk=article.pk)
+
+        # ✅ Create reply comment
+        Comment.objects.create(
+            article=article,
+            user=request.user,
+            name=request.user.username,
+            email=request.user.email,
+            content=content,
+            parent=parent_comment,
+        )
+
+        messages.success(request, "Reply posted successfully.")
+        return redirect('articles:article_detail', pk=article.pk)
+
+    return redirect('articles:article_detail', pk=article.pk)

@@ -19,6 +19,7 @@ urlpatterns = [
 
         # ✅ Subscription
     path('subscribe/', views.subscribe, name='subscribe'),
+    path('<int:pk>/reply/', views.admin_reply_comment, name='admin_reply_comment'),
 
 
 ]

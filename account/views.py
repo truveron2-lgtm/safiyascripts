@@ -75,17 +75,31 @@ def profile_view(request):
     return response
 
 
+from django.contrib import messages
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
+
 @never_cache
 @login_required(login_url='account:login')
 def logout_view(request):
-    """Logout and clear session/cache properly."""
+    """Logout and clear session/messages properly."""
+    # ✅ Clear any existing messages before logout
+    storage = messages.get_messages(request)
+    storage.used = True
+
+    # ✅ Log the user out
     logout(request)
 
-    # Disable browser caching after logout (prevents back-button access)
+    # ✅ Add a single fresh message for the logout event
+    messages.info(request, 'You have been logged out successfully.')
+
+    # ✅ Prevent caching (for security)
     response = redirect('account:login')
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, private'
     response['Pragma'] = 'no-cache'
-    messages.info(request, 'You have been logged out successfully.')
+
     return response
 
 
