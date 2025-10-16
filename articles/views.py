@@ -98,23 +98,41 @@ def article_create(request):
 
 @login_required
 def article_edit(request, pk):
-    article = get_object_or_404(Article, pk=pk, author=request.user)
+    """Allow only the article author or admin to edit."""
+    article = get_object_or_404(Article, pk=pk)
+
+    # Only the author or staff can edit
+    if request.user != article.author and not request.user.is_staff:
+        messages.error(request, "You do not have permission to edit this article.")
+        return redirect('articles:article_detail', pk=article.pk)
+
     if request.method == 'POST':
         form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             form.save()
+            messages.success(request, "Article updated successfully.")
             return redirect('articles:article_detail', pk=article.pk)
     else:
         form = ArticleForm(instance=article)
+
     return render(request, 'articles/article_form.html', {'form': form, 'title': 'Edit Article'})
 
 
 @login_required
 def article_delete(request, pk):
-    article = get_object_or_404(Article, pk=pk, author=request.user)
+    """Allow only the article author or admin to delete."""
+    article = get_object_or_404(Article, pk=pk)
+
+    # Only the author or staff can delete
+    if request.user != article.author and not request.user.is_staff:
+        messages.error(request, "You do not have permission to delete this article.")
+        return redirect('articles:article_detail', pk=article.pk)
+
     if request.method == 'POST':
         article.delete()
+        messages.success(request, "Article deleted successfully.")
         return redirect('articles:article_list')
+
     return render(request, 'articles/article_confirm_delete.html', {'article': article})
 
 

@@ -5,36 +5,76 @@
 {% block extra_css %}
 <style>
 body {
-    background-color: #faf8ff;
+  background-color: #faf8ff;
 }
 .dashboard-header {
-    text-align: center;
-    margin-bottom: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
 }
-.card {
-    border-radius: 15px;
-    border: none;
-    color: #fff;
+.filter-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
-.card-users { background: linear-gradient(135deg, #6a11cb, #2575fc); }
-.card-articles { background: linear-gradient(135deg, #ff758c, #ff7eb3); }
-.card-books { background: linear-gradient(135deg, #43cea2, #185a9d); }
-.card-subscribers { background: linear-gradient(135deg, #ffb347, #ffcc33); }
-.card h4 { margin-bottom: 0; }
-.search-filter {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
+.filter-form select {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 250px;
 }
-.search-filter input, .search-filter select {
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 48%;
+.chart-summary-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+.summary-table {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  flex: 1;
+  min-width: 250px;
+}
+.summary-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.summary-table th, .summary-table td {
+  padding: 8px 10px;
+  text-align: left;
+}
+.summary-table th {
+  background-color: #f3e5f5;
+  color: #4b0082;
+}
+.summary-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+.chart-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 220px;
+}
+#statsChart {
+  width: 220px !important;
+  height: 220px !important;
 }
 .table th {
-    background-color: #f3e5f5;
-    color: #4b0082;
+  background-color: #f3e5f5;
+  color: #4b0082;
+}
+@media (max-width: 768px) {
+  .chart-summary-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  .chart-container {
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
 }
 </style>
 {% endblock %}
@@ -43,86 +83,73 @@ body {
 <div class="container py-5">
   <div class="dashboard-header">
     <h2 class="fw-bold text-primary">Reports & Analytics</h2>
-    <p class="text-muted">Monitor and manage users, articles, books, and subscribers</p>
+    <p class="text-muted">Select a category to view reports</p>
   </div>
 
-  <div class="row mb-4 text-center">
-    <div class="col-md-3 mb-3">
-      <div class="card card-users p-3">
-        <h4>Users</h4>
-        <h2>{{ total_users }}</h2>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card card-articles p-3">
-        <h4>Articles</h4>
-        <h2>{{ total_articles }}</h2>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card card-books p-3">
-        <h4>Books</h4>
-        <h2>{{ total_books }}</h2>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card card-subscribers p-3">
-        <h4>Subscribers</h4>
-        <h2>{{ total_subscribers }}</h2>
-      </div>
-    </div>
-  </div>
-
-  <div class="search-filter">
-    <input type="text" placeholder="Search records...">
-    <select>
-      <option>Filter by Category</option>
-      <option>Users</option>
-      <option>Articles</option>
-      <option>Books</option>
-      <option>Subscribers</option>
+  <form method="get" class="filter-form">
+    <select name="filter" onchange="this.form.submit()">
+      <option value="all" {% if filter_type == 'all' %}selected{% endif %}>All Categories</option>
+      <option value="users" {% if filter_type == 'users' %}selected{% endif %}>Users</option>
+      <option value="articles" {% if filter_type == 'articles' %}selected{% endif %}>Articles</option>
+      <option value="books" {% if filter_type == 'books' %}selected{% endif %}>Books</option>
+      <option value="subscribers" {% if filter_type == 'subscribers' %}selected{% endif %}>Subscribers</option>
+      <option value="visitors" {% if filter_type == 'visitors' %}selected{% endif %}>Visitors</option>
     </select>
-  </div>
+  </form>
 
-  <div class="mb-4">
-    <canvas id="statsChart"></canvas>
-  </div>
+  <div class="chart-summary-wrapper">
+    <div class="summary-table">
+      <h5 class="text-primary fw-bold mb-3">
+        {% if filter_type == 'all' %}Summary Table{% else %}{{ context_data.title }}{% endif %}
+      </h5>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            {% for header in context_data.headers %}
+              <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in context_data.rows %}
+            <tr>
+              {% for cell in row %}
+                <td>{{ cell }}</td>
+              {% endfor %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="{{ context_data.headers|length }}">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if filter_type == 'visitors' %}
+        <p class="mt-2"><strong>Total Views:</strong> {{ context_data.total_views }}</p>
+      {% endif %}
+    </div>
 
-  <h4 class="mt-4">Recent Articles</h4>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Title</th><th>Author</th><th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for article in recent_articles %}
-      <tr>
-        <td>{{ article.title }}</td>
-        <td>{{ article.author }}</td>
-        <td>{{ article.created_at|date:"M d, Y" }}</td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="3">No articles found.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <div class="chart-container">
+      <canvas id="statsChart"></canvas>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const ctx = document.getElementById('statsChart');
+
 new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Users', 'Articles', 'Books', 'Subscribers'],
-        datasets: [{
-            label: 'Site Overview',
-            data: [{{ total_users }}, {{ total_articles }}, {{ total_books }}, {{ total_subscribers }}],
-            backgroundColor: ['#6a11cb', '#ff758c', '#43cea2', '#ffb347']
-        }]
-    },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+  type: 'pie',
+  data: {
+    labels: {{ chart_labels|safe }},
+    datasets: [{
+      data: {{ chart_data|safe }},
+      backgroundColor: ['#6a11cb', '#ff758c', '#43cea2', '#ffb347', '#ffcc33']
+    }]
+  },
+  options: {
+    responsive: false,
+    plugins: { legend: { position: 'bottom' } }
+  }
 });
 </script>
 {% endblock %}
