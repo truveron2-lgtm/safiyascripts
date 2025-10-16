@@ -1,0 +1,19 @@
+{% extends 'base_admin.html' %}
+{% block title %}View Contact Message{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Message from {{ contact.name }}</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Email:</strong> {{ contact.email }}</p>
+      <p><strong>Date:</strong> {{ contact.created_at|date:"M d, Y H:i" }}</p>
+      <hr>
+      <p>{{ contact.message|linebreaks }}</p>
+      <a href="{% url 'contact:contact_list' %}" class="btn btn-secondary mt-3">Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'faith',
     'stats',
     'report',
+    'contact',
 ]
 
 import os

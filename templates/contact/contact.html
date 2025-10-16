@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-primary">Contact Me</h2>
+    <p class="text-muted">I would love to hear from you! Please fill out the form below.</p>
+    <p class="text-muted"><b>Email: info@safiyascripts.com</b></p>
+  </div>
+
+  {# Show only the latest message and clear others #}
+ 
+  <div class="card shadow-lg rounded-3 mx-auto" style="max-width: 600px;">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary w-100 mt-3">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
