@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Visitor, PageView
 from django.db.models import Count
+from django.contrib.auth.decorators import login_required
 
-@staff_member_required
+
+@login_required
 def stats_dashboard(request):
     total_visitors = Visitor.objects.count()
     total_page_views = PageView.objects.count()
