@@ -1,0 +1,94 @@
+{% load static %}
+<!-- ===== COUNSELLOR’S DESK SECTION ===== -->
+<section class="counsellor-section py-5">
+  <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <!-- Text Content -->
+    <div class="counsellor-text text-center text-md-start mb-4 mb-md-0">
+      <h2 class="counsellor-title mb-3">The Counsellor’s Desk</h2>
+      <p class="lead">
+        There are seasons when life feels heavy—when the heart quietly searches for peace and direction.
+        <strong>The Counsellor’s Desk</strong> is a place of spiritual care and gentle guidance—a space to pause,
+        reflect, and rediscover hope through the living Word of God.
+      </p>
+      <p>
+        You are invited to share your heart and find comfort in faith-filled counsel. Sometimes, healing begins
+        with a single step—a conversation.
+      </p>
+      <a href="https://safiyascripts.com/contact/" target="_blank" rel="noopener noreferrer" class="contact-btn">
+        <i class="fas fa-envelope me-2"></i> Contact the Counsellor
+      </a>
+    </div>
+
+    <!-- Image Placeholder -->
+    <div class="counsellor-image ms-md-4 text-center">
+      <img src="{% static 'blog/images/counsellor_desk.png' %}" 
+           alt="The Counsellor’s Desk" 
+           class="img-fluid rounded shadow-sm counsellor-img">
+    </div>
+  </div>
+</section>
+
+<style>
+  .counsellor-section {
+    background-color: #ffffff;
+    border-top: 1px solid #f3e8da;
+    border-bottom: 1px solid #f3e8da;
+  }
+
+  .counsellor-title {
+    color: #7b4f1d;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  .counsellor-text p {
+    color: #333;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #7b4f1d;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .contact-btn:hover {
+    background-color: #9b6b34;
+    transform: translateY(-2px);
+  }
+
+  .counsellor-image {
+    flex: 0 0 40%;
+  }
+
+  .counsellor-img {
+    max-width: 400px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .counsellor-section {
+      text-align: center;
+    }
+
+    .counsellor-image {
+      margin-top: 20px;
+    }
+
+    .counsellor-title {
+      font-size: 1.6rem;
+    }
+
+    .counsellor-text p {
+      font-size: 1rem;
+    }
+  }
+</style>
