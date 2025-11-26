@@ -322,26 +322,33 @@ def article_detail_public(request, pk):
 # -----------------------------
 # Optional: Article Audio Regeneration (Admin)
 # -----------------------------
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from .models import Article
 from .utils import generate_article_audio
 
 @login_required
 def regenerate_audio(request, pk):
-    """Allow admin/staff to regenerate article audio."""
+    """
+    Allow admin/staff to regenerate article audio with intro and outro.
+    """
+    # Fetch the article
     article = get_object_or_404(Article, pk=pk)
 
+    # Check staff permission
     if not request.user.is_staff:
         messages.error(request, "You do not have permission to regenerate audio.")
         return redirect('articles:article_detail_public', pk=article.pk)
 
     try:
-        audio_file = generate_article_audio(article)  # Should return a FileField-compatible object
-        article.audio = audio_file
-        article.save()
+        # Generate audio: intro + article + outro
+        generate_article_audio(article)
         messages.success(request, "Audio regenerated successfully.")
     except Exception as e:
         messages.error(request, f"Error generating audio: {e}")
 
+    # Redirect back to article detail page
     return redirect('articles:article_detail_public', pk=article.pk)
     
 from .forms import SubscriptionForm
