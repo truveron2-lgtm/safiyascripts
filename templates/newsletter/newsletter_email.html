@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
+        .container { width: 90%; max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+        h1 { color: #0056b3; }
+        .section { margin-bottom: 20px; }
+        .section img { max-width: 100%; height: auto; margin-top: 10px; display: block; }
+        .section a { color: #0056b3; text-decoration: none; }
+        hr { border: 0; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>{{ newsletter.title }} - Volume {{ newsletter.volume }} ({{ newsletter.month }})</h1>
+    <p><em>Published on {{ newsletter.publish_date }}</em></p>
+    <hr>
+
+    <!-- Main Content -->
+    <div class="section main-content">
+        {{ newsletter.main_content|safe }}
+    </div>
+
+    <!-- Sections -->
+    {% for section in newsletter.sections.all %}
+        <div class="section">
+            {% if section.heading %}
+                <h3>{{ section.heading }}</h3>
+            {% endif %}
+            
+            {% if section.content %}
+                <p>{{ section.content|safe }}</p>
+            {% endif %}
+
+            {% if section.link %}
+                <p><a href="{{ section.link }}" target="_blank">Read more</a></p>
+            {% endif %}
+
+            {% if section.image %}
+                <img src="cid:img_{{ section.id }}" 
+                     alt="{{ section.heading|default:'Section Image' }}" 
+                     style="max-width:100%; display:block; margin-top:10px;">
+            {% endif %}
+        </div>
+    {% endfor %}
+
+</div>
+</body>
+</html>

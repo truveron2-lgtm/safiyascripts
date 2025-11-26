@@ -16,6 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import AutoSitemap
+from .views import universal_detail
+
+
+sitemaps = {
+    'auto': AutoSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,6 +36,12 @@ urlpatterns = [
     path('stats/', include('stats.urls')),
     path('report/', include('report.urls')),
     path('contact/', include('contact.urls')),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
+       # Comments app
+    path('comments/', include('comments.urls', namespace='comments')),  # <-- our new app
+    path('newsletter/', include(('newsletter.urls', 'newsletter'), namespace='newsletter')),
+
+    path("<str:model_name>/<int:pk>/", universal_detail, name="universal_detail")
 
 ]
 

@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'widget_tweaks',
+    'django.contrib.sites',
     'blog',
     'account',
     'articles',
@@ -54,7 +57,12 @@ INSTALLED_APPS = [
     'stats',
     'report',
     'contact',
+    'comments',  # <-- Add the new comments app here
+    'newsletter',
 ]
+
+SITE_ID = 1
+
 
 import os
 from pathlib import Path
@@ -87,6 +95,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.hostinger.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'info@safiyascripts.com'
+EMAIL_HOST_PASSWORD = 'Safiya2025@'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = 'SafiyaScripts <info@safiyascripts.com>'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -130,12 +148,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import dj_database_url
+from pathlib import Path
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
+
+# Add SSL options manually if not already present
+DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 
 # Password validation

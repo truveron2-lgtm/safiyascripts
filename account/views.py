@@ -30,6 +30,12 @@ def login_view(request):
     return render(request, 'account/login.html')
 
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .forms import UserRegisterForm
+
 @never_cache
 @login_required(login_url='account:login')
 def register_view(request):
@@ -126,31 +132,40 @@ def user_list(request):
     return render(request, 'account/user_list.html', {'page_obj': page_obj})
 
 
-@login_required
-def edit_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    profile, created = Profile.objects.get_or_create(user=user)
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .forms import UserEditForm, ProfileUpdateForm
 
-    if request.method == 'POST':
-        user_form = UserRegisterForm(request.POST, instance=user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+def edit_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        user_form = UserEditForm(request.POST, instance=user_obj)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=user_obj.profile)
 
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, f"{user.username}'s details updated successfully!")
-            return redirect('account:user_list')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        user_form = UserRegisterForm(instance=user)
-        profile_form = ProfileUpdateForm(instance=profile)
+            # Save user
+            user = user_form.save()
 
-    return render(request, 'account/edit_user.html', {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'user_obj': user
-    })
+            # Save profile
+            profile = profile_form.save()
+
+            messages.success(request, "User updated successfully!")
+            return redirect("account:user_list")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        user_form = UserEditForm(instance=user_obj)
+        profile_form = ProfileUpdateForm(instance=user_obj.profile)
+
+    context = {
+        "user_obj": user_obj,
+        "user_form": user_form,
+        "profile_form": profile_form
+    }
+
+    return render(request, "account/edit_user.html", context)
 
 
 @login_required

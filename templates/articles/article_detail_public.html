@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
+
+<!-- Newsletter subscription prompt -->
 <div class="alert alert-info mt-4 p-4 rounded shadow-sm">
   <h5 class="fw-bold text-primary mb-2">Join the SafiyaScripts Community 💌</h5>
   <p class="mb-3">
@@ -12,60 +14,106 @@
 </div>
 
 <hr>
-  <h2 class="mb-3">{{ article.title }}</h2>
-  <p class="text-muted">By {{ article.author.username }} | {{ article.date_posted|date:"M d, Y" }}</p>
 
-  {% if article.image %}
-    <img src="{{ article.image.url }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
-  {% endif %}
+<!-- Article title & meta -->
+<h2 class="mb-3">{{ article.title }}</h2>
+<p class="text-muted">
+  By {{ article.author.username }} | {{ article.date_posted|date:"M d, Y" }}
+</p>
 
-  <p>{{ article.full_description|linebreaks }}</p>
-
-  <hr>
-  {% if not user.is_authenticated %}
-  <p class="text-muted mt-2">
-    New here? You must <a href="{% url 'articles:subscribe' %}" class="text-decoration-none text-primary">subscribe</a> before posting a comment.
-  </p>
+<!-- Article image -->
+{% if article.image %}
+  <img src="{{ article.image.url }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
 {% endif %}
 
-  <h4>Comments</h4>
-  <div class="mt-3">
-    {% for comment in comments %}
-      <div class="border p-3 mb-3 rounded bg-light">
-        <p><strong>{{ comment.name }}</strong> <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small></p>
-        <p>{{ comment.content }}</p>
-        {% for reply in comment.replies.all %}
-          <div class="ms-4 mt-2 border-start ps-3">
-            <p><strong>{{ reply.name }}</strong> <small class="text-muted">{{ reply.created_at|date:"M d, Y H:i" }}</small></p>
-            <p>{{ reply.content }}</p>
-          </div>
-        {% endfor %}
-      </div>
-    {% empty %}
-      <p>No comments yet. Be the first to comment!</p>
-    {% endfor %}
-  </div>
-
- <hr> 
-  <h5>Leave a Comment</h5>
-  <form method="post" class="mt-3" id="comment-form">
-    {% csrf_token %}
-    {{ comment_form.as_p }}
-    <input type="hidden" name="parent_id" id="parent_id">
-    <button type="submit" class="btn btn-primary">Post Comment</button>
-  </form>
-
-  
+<!-- Article full content -->
+<div class="mb-4">
+  <p>{{ article.full_description|linebreaks }}</p>
 </div>
 
+<!-- Article audio player (if exists) -->
+{% if article.audio_file %}
+<div class="mt-4 p-3 bg-light rounded shadow-sm">
+  <h5 class="mb-2">🎧 Listen to This Article</h5>
+  <audio controls class="w-100">
+      <source src="{{ article.audio_file.url }}" type="audio/mpeg">
+      Your browser does not support audio playback.
+  </audio>
+
+  {% if user.is_staff %}
+    <a href="{% url 'articles:regenerate_audio' article.pk %}" class="btn btn-warning btn-sm mt-2">
+      Regenerate Audio
+    </a>
+  {% endif %}
+</div>
+{% endif %}
+
+<hr>
+
+<!-- Prompt for non-logged-in users -->
+{% if not user.is_authenticated %}
+<p class="text-muted mt-2">
+  New here? You must 
+  <a href="{% url 'articles:subscribe' %}" class="text-decoration-none text-primary">subscribe</a> 
+  before posting a comment.
+</p>
+{% endif %}
+
+<!-- Comments section -->
+<h4>Comments</h4>
+<div class="mt-3">
+  {% if comments %}
+    {% for comment in comments %}
+      <div class="border p-3 mb-3 rounded bg-light">
+        <p><strong>{{ comment.name }}</strong> 
+           <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+        </p>
+        <p>{{ comment.content }}</p>
+
+        {% if comment.replies.all %}
+          {% for reply in comment.replies.all %}
+            <div class="ms-4 mt-2 border-start ps-3">
+              <p><strong>{{ reply.name }}</strong> 
+                 <small class="text-muted">{{ reply.created_at|date:"M d, Y H:i" }}</small>
+              </p>
+              <p>{{ reply.content }}</p>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          <a href="#" class="reply-link text-primary" data-comment="{{ comment.id }}">Reply</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">No comments yet. Be the first to comment!</p>
+  {% endif %}
+</div>
+
+<hr>
+
+<!-- Comment form -->
+<h5>Leave a Comment</h5>
+<form method="post" class="mt-3" id="comment-form">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <input type="hidden" name="parent_id" id="parent_id">
+  <button type="submit" class="btn btn-primary">Post Comment</button>
+</form>
+
+<!-- Reply form JS -->
 <script>
-document.querySelectorAll('.reply-link').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.preventDefault();
-    const parentId = btn.getAttribute('data-comment');
-    document.getElementById('parent_id').value = parentId;
-    window.scrollTo({ top: document.getElementById('comment-form').offsetTop, behavior: 'smooth' });
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.reply-link').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const parentId = btn.getAttribute('data-comment');
+      document.getElementById('parent_id').value = parentId;
+      window.scrollTo({ top: document.getElementById('comment-form').offsetTop, behavior: 'smooth' });
+    });
   });
 });
 </script>
+
 {% endblock %}

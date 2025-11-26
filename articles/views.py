@@ -82,6 +82,13 @@ def article_detail(request, pk):
     return render(request, 'articles/article_detail.html', context)
 
 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .forms import ArticleForm
+from .utils import generate_article_audio   # <-- ADD THIS
+
+
 @login_required
 def article_create(request):
     if request.method == 'POST':
@@ -90,15 +97,36 @@ def article_create(request):
             article = form.save(commit=False)
             article.author = request.user
             article.save()
+
+            # 🔊 Generate audio automatically
+            try:
+                generate_article_audio(article)
+                messages.success(request, "Article created successfully, and audio generated.")
+            except Exception as e:
+                messages.warning(request, f"Article saved but audio could not be generated: {e}")
+
             return redirect('articles:article_detail', pk=article.pk)
+
     else:
         form = ArticleForm()
-    return render(request, 'articles/article_form.html', {'form': form, 'title': 'Create Article'})
+
+    return render(request, 'articles/article_form.html', {
+        'form': form,
+        'title': 'Create Article'
+    })
+
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import ArticleForm
+from .models import Article
+from .utils import generate_article_audio   # Make sure this exists
 
 
 @login_required
 def article_edit(request, pk):
-    """Allow only the article author or admin to edit."""
+    """Allow only the article author or admin to edit an article with audio generation."""
     article = get_object_or_404(Article, pk=pk)
 
     # Only the author or staff can edit
@@ -109,13 +137,25 @@ def article_edit(request, pk):
     if request.method == 'POST':
         form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Article updated successfully.")
+            article = form.save()
+
+            # 🔊 Regenerate audio after edit
+            try:
+                generate_article_audio(article)
+                messages.success(request, "Article updated successfully and audio regenerated.")
+            except Exception as e:
+                messages.warning(request, f"Article updated but audio could not be regenerated: {e}")
+
             return redirect('articles:article_detail', pk=article.pk)
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = ArticleForm(instance=article)
 
-    return render(request, 'articles/article_form.html', {'form': form, 'title': 'Edit Article'})
+    return render(request, 'articles/article_form.html', {
+        'form': form,
+        'title': 'Edit Article'
+    })
 
 
 @login_required
@@ -174,41 +214,44 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Q
-from .models import Article, Comment, Subscriber
-from .forms import CommentForm
-
-
-def article_list_public(request):
-    """Public-facing article list."""
-    search_query = request.GET.get('q', '')
-    if search_query:
-        articles = Article.objects.filter(
-            Q(title__icontains=search_query) | Q(short_description__icontains=search_query)
-        )
-    else:
-        articles = Article.objects.all()
-
-    paginator = Paginator(articles, 6)  # show 6 per page
-    page = request.GET.get('page')
-    articles = paginator.get_page(page)
-
-    return render(request, 'articles/article_list_public.html', {
-        'articles': articles,
-        'search_query': search_query
-    })
-
-
-from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.contrib import messages
 from django.utils.html import strip_tags
 from .models import Article, Comment, Subscriber
 from .forms import CommentForm
 
+# -----------------------------
+# Public Article List
+# -----------------------------
+def article_list_public(request):
+    """Public-facing article list with search and pagination."""
+    search_query = request.GET.get('q', '').strip()
+    
+    # Only show published articles
+    articles = Article.objects.filter(is_published=True)
+    
+    if search_query:
+        articles = articles.filter(
+            Q(title__icontains=search_query) | Q(short_description__icontains=search_query)
+        )
 
+    # Pagination (6 articles per page)
+    paginator = Paginator(articles.order_by('-date_posted'), 6)
+    page_number = request.GET.get('page')
+    articles_page = paginator.get_page(page_number)
+
+    context = {
+        'articles': articles_page,
+        'search_query': search_query
+    }
+    return render(request, 'articles/article_list_public.html', context)
+
+
+# -----------------------------
+# Public Article Detail
+# -----------------------------
 def article_detail_public(request, pk):
-    """Public-facing article detail and comment submission."""
-    article = get_object_or_404(Article, pk=pk)
+    """Public-facing article detail with audio, comments, replies, and subscription check."""
+    article = get_object_or_404(Article, pk=pk, is_published=True)
     comments = article.comments.filter(parent__isnull=True).select_related('user')
     comment_form = CommentForm()
 
@@ -219,7 +262,7 @@ def article_detail_public(request, pk):
             email = comment_form.cleaned_data.get('email', '').strip()
             parent_id = request.POST.get('parent_id')
 
-            # 🚫 Block impersonation of "SafiyaScripts" or similar
+            # 🚫 Prevent impersonation
             forbidden_names = ['safiyascripts', 'safiyascript']
             if name.lower() in forbidden_names:
                 messages.error(
@@ -228,20 +271,22 @@ def article_detail_public(request, pk):
                 )
                 return redirect('articles:article_detail_public', pk=article.pk)
 
-            # 💬 Handle replies (only logged-in users can reply)
+            # 💬 Handle replies
+            parent_comment = None
             if parent_id:
                 if not request.user.is_authenticated:
                     messages.error(
                         request,
-                        "Only logged-in users can reply to comments. Please log in to continue."
+                        "Only logged-in users can reply to comments. Please log in first."
                     )
                     return redirect('account:login')
                 parent_comment = Comment.objects.filter(id=parent_id).first()
+            # Top-level comment
             else:
                 parent_comment = None
 
-            # 📧 Check subscription (only for top-level comments)
-            if not parent_id and not Subscriber.objects.filter(email=email).exists():
+            # 📧 Subscription check for top-level comments
+            if not parent_comment and not Subscriber.objects.filter(email=email).exists():
                 subscribe_url = reverse('articles:subscribe')
                 messages.warning(
                     request,
@@ -254,11 +299,10 @@ def article_detail_public(request, pk):
             comment.article = article
             comment.parent = parent_comment
 
-            # Auto-fill for logged-in users
             if request.user.is_authenticated:
+                comment.user = request.user
                 comment.name = request.user.username
                 comment.email = request.user.email
-                comment.user = request.user
             else:
                 comment.name = strip_tags(name)
                 comment.email = email
@@ -267,11 +311,38 @@ def article_detail_public(request, pk):
             messages.success(request, "Your comment has been posted successfully.")
             return redirect('articles:article_detail_public', pk=article.pk)
 
-    return render(request, 'articles/article_detail_public.html', {
+    context = {
         'article': article,
         'comments': comments,
         'comment_form': comment_form,
-    })
+    }
+    return render(request, 'articles/article_detail_public.html', context)
+
+
+# -----------------------------
+# Optional: Article Audio Regeneration (Admin)
+# -----------------------------
+from django.contrib.auth.decorators import login_required
+from .utils import generate_article_audio
+
+@login_required
+def regenerate_audio(request, pk):
+    """Allow admin/staff to regenerate article audio."""
+    article = get_object_or_404(Article, pk=pk)
+
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to regenerate audio.")
+        return redirect('articles:article_detail_public', pk=article.pk)
+
+    try:
+        audio_file = generate_article_audio(article)  # Should return a FileField-compatible object
+        article.audio = audio_file
+        article.save()
+        messages.success(request, "Audio regenerated successfully.")
+    except Exception as e:
+        messages.error(request, f"Error generating audio: {e}")
+
+    return redirect('articles:article_detail_public', pk=article.pk)
     
 from .forms import SubscriptionForm
 
@@ -330,3 +401,4 @@ def admin_reply_comment(request, pk):
         return redirect('articles:article_detail', pk=article.pk)
 
     return redirect('articles:article_detail', pk=article.pk)
+

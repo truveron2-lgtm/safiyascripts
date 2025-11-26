@@ -12,6 +12,8 @@ urlpatterns = [
     path('<int:pk>/delete/', views.article_delete, name='article_delete'),
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
     path('subscribers/', views.subscribers_list, name='subscribers_list'),
+    path("article/<int:pk>/regen-audio/", views.regenerate_audio, name="regenerate_audio"),
+
 
     # ✅ Public pages
     path('public/', views.article_list_public, name='article_list_public'),

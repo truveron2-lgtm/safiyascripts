@@ -4,7 +4,7 @@
 {% block content %}
 <style>
   .register-container {
-    max-width: 600px;
+    max-width: 650px;
     margin: 70px auto;
     background: #fff;
     padding: 50px 40px;
@@ -23,7 +23,9 @@
     margin-bottom: 18px;
   }
 
-  .register-container input,
+  .register-container input[type="text"],
+  .register-container input[type="email"],
+  .register-container input[type="password"],
   .register-container select,
   .register-container textarea {
     width: 100%;
@@ -41,6 +43,19 @@
     box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
   }
 
+  /* Checkbox styling wrapper */
+  .checkbox-group {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .checkbox-group label {
+    margin: 0;
+    font-weight: 500;
+  }
+
   .register-container button {
     width: 100%;
     border-radius: 8px;
@@ -55,12 +70,61 @@
 </style>
 
 <div class="register-container">
-  <h2>Create Your Account</h2>
+  <h2>Create User Account</h2>
+
   <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Register</button>
+
+    <!-- Username -->
+    <p>
+      <label for="{{ form.username.id_for_label }}">Username:</label>
+      {{ form.username }}
+    </p>
+
+    <!-- Email -->
+    <p>
+      <label for="{{ form.email.id_for_label }}">Email:</label>
+      {{ form.email }}
+    </p>
+
+    <!-- Password -->
+    <p>
+      <label for="{{ form.password1.id_for_label }}">Password:</label>
+      {{ form.password1 }}
+    </p>
+
+    <!-- Confirm Password -->
+    <p>
+      <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+      {{ form.password2 }}
+    </p>
+
+    <!-- Role -->
+    <p>
+      <label for="{{ form.role.id_for_label }}">Role:</label>
+      {{ form.role }}
+    </p>
+
+    <hr>
+
+    <!-- Admin Privileges -->
+    <h5 class="text-primary mb-3">Admin Privileges</h5>
+
+    <div class="checkbox-group">
+      {{ form.is_active }} <label for="{{ form.is_active.id_for_label }}">Active Account</label>
+    </div>
+
+    <div class="checkbox-group">
+      {{ form.is_staff }} <label for="{{ form.is_staff.id_for_label }}">Staff Status</label>
+    </div>
+
+    <div class="checkbox-group">
+      {{ form.is_superuser }} <label for="{{ form.is_superuser.id_for_label }}">Super Admin</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Create User</button>
   </form>
+
   <p class="text-center mt-3">
     Already have an account?
     <a href="{% url 'account:login' %}">Login here</a>.

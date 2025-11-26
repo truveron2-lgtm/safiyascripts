@@ -1,0 +1,15 @@
+{% extends 'base_admin.html' %}
+{% block content %}
+{% include 'newsletter/style.html' %}
+
+<div class="card mt-4 p-4 text-center">
+    <h2 class="text-success mb-3">Newsletter Sent Successfully!</h2>
+
+    <p>Your newsletter <strong>{{ newsletter.title }}</strong> has been delivered to all subscribers.</p>
+
+    <div class="mt-3">
+        <a class="btn btn-primary" href="{% url 'newsletter:create_newsletter' %}">Create Another Newsletter</a>
+        <a class="btn btn-secondary ms-2" href="{% url 'newsletter:add_sections' newsletter.id %}">View Sections</a>
+    </div>
+</div>
+{% endblock %}

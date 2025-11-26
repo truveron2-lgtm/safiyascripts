@@ -14,12 +14,139 @@
 
   <!-- Custom CSS -->
   <link href="{% static 'blog/css/style.css' %}" rel="stylesheet">
+
+  <style>
+    /* ===== HERO / Festive Banner ===== */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 60px 20px; /* responsive padding */
+      height: 40vh; /* smaller for mobile-friendly */
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(135deg, #ff7f50, #ffb347); 
+      border-radius: 15px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Snow effect */
+    .snowflake {
+      position: absolute;
+      top: -10px;
+      color: #fff;
+      font-size: 1em;
+      user-select: none;
+      z-index: 1000;
+      animation-name: fall;
+      animation-duration: 10s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity:1;}
+      100% { transform: translateY(100vh) rotate(360deg); opacity:0;}
+    }
+
+    /* Carousel text */
+    .carousel-inner h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 3vw; /* responsive size for desktop */
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap; /* wrap for small screens */
+      line-height: 1.2;
+    }
+
+    .carousel-inner p {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+
+    /* Responsive font adjustments */
+    @media (max-width: 768px) {
+      .carousel-inner h1 {
+        font-size: 6vw;
+      }
+      .carousel-inner p {
+        font-size: 4vw;
+      }
+      .hero {
+        padding: 40px 10px;
+        height: 40vh;
+      }
+      .hero-icon {
+        height: 40px;
+      }
+    }
+
+    /* Carousel controls */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-color: rgba(0,0,0,0.3);
+      border-radius: 50%;
+      padding: 10px;
+    }
+
+    /* Festive carousel slides */
+    .carousel-item:nth-child(1) { background: linear-gradient(135deg, #ff9a9e, #86660CFF); }
+    .carousel-item:nth-child(2) { background: linear-gradient(135deg, #fbc2eb, #09275CFF); }
+    .carousel-item:nth-child(3) { background: linear-gradient(135deg, #ffecd2, #852809FF); }
+
+    /* Icon style */
+    .hero-icon {
+      height: 50px;
+      width: auto;
+    }
+
+    /* Emoji fallback */
+    .hero-emoji {
+      font-size: 1.5em;
+      animation: bob 1.5s infinite alternate;
+    }
+
+    @keyframes bob {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-10px);}
+    }
+    .amazon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* spacing between logo and text */
+  padding: 6px 12px; /* smaller padding */
+  font-size: 0.9rem; /* slightly smaller font */
+  background-color: #FF9900; /* Amazon-like color */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.amazon-btn img {
+  height: 20px; /* smaller logo */
+  width: auto;
+}
+
+.amazon-btn:hover {
+  background-color: #e68a00; /* darker on hover */
+  transform: scale(1.05);
+}
+  </style>
 </head>
 
 <body>
 
   <!-- ===== NAVBAR ===== -->
-  <nav class="navbar navbar-expand-lg sticky-top">
+  <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
     <div class="container">
       <a class="navbar-brand" href="#">SafiyaScripts</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -39,92 +166,107 @@
     </div>
   </nav>
 
-  <!-- ===== HERO ===== -->
+  <!-- ===== HERO / Festive Carousel ===== -->
   <section class="hero">
-    <h1>Faith. Purpose. Words that Uplift.</h1>
-    <p>Welcome to <strong>SafiyaScripts</strong> — a Christian blog that shares stories, reflections, and truths rooted in God’s Word to strengthen your walk with Christ.</p>
+    <div id="heroCarousel" class="carousel slide w-100" data-bs-ride="carousel" data-bs-interval="5000">
+      <div class="carousel-inner text-center py-5">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+          <h1>
+            <img src="{% static 'blog/images/santa_hat.png' %}" alt="Santa Hat" class="hero-icon" 
+              onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span class=\'hero-emoji\'>🎅</span>');">
+            Faith. Purpose. Words that Uplift.
+          </h1>
+          <p>Welcome to <strong>SafiyaScripts</strong> — a Christian blog sharing stories, reflections, and truths.</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+          <h1>
+            <img src="{% static 'blog/images/santa_hat.png' %}" alt="Santa Hat" class="hero-icon" 
+              onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span class=\'hero-emoji\'>🎄</span>');">
+            Season of Joy & Reflection
+          </h1>
+          <p>Celebrate the warmth, hope, and generous spirit of this festive season.</p>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+          <h1>
+            <img src="{% static 'blog/images/santa_hat.png' %}" alt="Santa Hat" class="hero-icon" 
+              onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span class=\'hero-emoji\'>❄️</span>');">
+            Celebrate the Gift of Light
+          </h1>
+          <p>Reflect, rejoice, and renew your spirit with God’s Word during this special time.</p>
+        </div>
+      </div>
+
+      <!-- Carousel controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+
+    <!-- Snow effect -->
+    <div id="snow-container"></div>
   </section>
 
   <!-- ===== ARTICLES ===== -->
   {% include 'articles/article_summary_home.html' %}
 
   <!-- ===== BOOK AD SECTION ===== -->
-<div class="container">
-  <div class="book-ad d-flex flex-column flex-md-row align-items-center justify-content-center gap-4">
+  <div class="container">
+  <div class="book-ad d-flex flex-column flex-md-row align-items-start justify-content-start gap-4">
     <!-- Book Image -->
     <div class="book-image">
-      <img src="{% static 'blog/images/safiya_book.png' %}" alt="The Neglected One Book Cover" class="img-fluid shadow rounded-4">
+      <img src="{% static 'blog/images/safiya_book.png' %}" 
+           alt="The Neglected One Book Cover" 
+           class="img-fluid shadow rounded-4">
     </div>
 
-    <!-- Book Details -->
-    <div class="book-text text-center text-md-start">
+    <!-- Book Text -->
+    <div class="book-text text-start">
       <h3>Featured Book: <em>The Neglected One</em></h3>
-      <p>
-        There are moments in life when we sense that something vital is missing—not from the world around us, 
-        but from within us. <br><br>
-        <em><strong>The Neglected One</strong></em> is a heartfelt reflection on rediscovering the quiet, transforming 
-        Presence of the Holy Spirit—the One who has been with us all along, waiting not to be understood, but 
-        recognized and embraced. This book is not written to instruct, but to awaken—to call us back to the 
-        stillness where faith breathes again.
-      </p>
-        <a href="https://www.amazon.com/Neglected-One-Reflection-forgotten-Presence/dp/B0FXPRHS5V/"
-          target="_blank" rel="noopener noreferrer" class="amazon-btn-link">
-          <button class="amazon-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon logo">
-            <span>Buy Now on Amazon</span>
-          </button>
-        </a>
-
-<style>
-  .amazon-btn-link {
-    text-decoration: none;
-  }
-
-  .amazon-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #FF9900; /* Amazon orange */
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-  }
-
-  .amazon-btn:hover {
-    background-color: #e68a00;
-  }
-
-  .amazon-btn img {
-    height: 20px;
-    width: auto;
-  }
-</style>
-
-
-
+      <p>There are moments in life when we sense that something vital is missing…</p>
+      <a href="https://www.amazon.com/Neglected-One-Reflection-forgotten-Presence/dp/B0FXPRHS5V/" target="_blank" class="amazon-btn-link">
+        <button class="amazon-btn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon logo">
+          <span>Buy Now on Amazon</span>
+        </button>
+      </a>
     </div>
- 
   </div>
-
-  
 </div>
-<br />
-<!-- ===== Counselling Desk ===== -->
+
+  <br />
+
+  <!-- ===== Counselling Desk ===== -->
   {% include 'articles/counsellor.html' %}
 
   <!-- ===== FOOTER ===== -->
-  <footer>
-    © 2025 SafiyaScripts — “Let your light so shine before men” (Matthew 5:16)
-  — Powered by VirtualPot
+  <footer class="bg-light text-dark text-center py-3">
+    © 2025 SafiyaScripts — “Let your light so shine before men” (Matthew 5:16) — Powered by VirtualPot
   </footer>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Snow JS -->
+  <script>
+    const snowContainer = document.getElementById('snow-container');
+    for(let i=0; i<50; i++){
+      const snow = document.createElement('div');
+      snow.className = 'snowflake';
+      snow.style.left = Math.random() * 100 + 'vw';
+      snow.style.animationDuration = (5 + Math.random() * 5) + 's';
+      snow.style.fontSize = (10 + Math.random() * 20) + 'px';
+      snow.innerHTML = '❄';
+      snowContainer.appendChild(snow);
+    }
+  </script>
 
 </body>
 </html>

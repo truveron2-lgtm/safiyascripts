@@ -1,0 +1,51 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">All New Comments</h2>
+
+    {% if comments %}
+        {% for comment in comments %}
+        <div class="border rounded p-3 mb-3">
+            <p>
+                <strong>{{ comment.name }}</strong> 
+                (<a href="mailto:{{ comment.email }}">{{ comment.email }}</a>) 
+                commented on: <em>{{ comment.article.title }}</em>
+            </p>
+            <p>{{ comment.content|linebreaks }}</p>
+
+            <form method="post" class="mb-2">
+                {% csrf_token %}
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                {{ form.content }}
+                <button type="submit" class="btn btn-sm btn-success mt-1">Reply</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if comments.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ comments.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% for num in comments.paginator.page_range %}
+                    <li class="page-item {% if comments.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if comments.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ comments.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <p>No new comments at the moment.</p>
+    {% endif %}
+</div>
+{% endblock %}

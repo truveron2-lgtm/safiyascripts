@@ -1,0 +1,70 @@
+{% extends 'base_admin.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+{% include 'newsletter/style.html' %}
+
+<div class="container mt-4">
+    <div class="card p-4 mx-auto" style="max-width: 900px;">
+        <h2 class="mb-4 text-center">Add Sections to "{{ newsletter.title }}"</h2>
+
+        <form method="POST" action="{% url 'newsletter:add_sections' newsletter.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- Optional Heading -->
+            <div class="mb-3">
+                {{ form.heading.label_tag }}
+                {{ form.heading|add_class:"form-control" }}
+                <small class="text-muted">Optional: leave blank if you don't want a heading for this section.</small>
+                {{ form.heading.errors }}
+            </div>
+
+            <!-- Content (HTML or plain text) -->
+            <div class="mb-3">
+                {{ form.content.label_tag }}
+                {{ form.content|add_class:"form-control" }}
+                <small class="text-muted">You can type text or paste HTML. It will render in the newsletter preview.</small>
+                {{ form.content.errors }}
+            </div>
+
+            <!-- Optional Image -->
+            <div class="mb-3">
+                {{ form.image.label_tag }}
+                {{ form.image|add_class:"form-control" }}
+                {{ form.image.errors }}
+            </div>
+
+            <!-- Order -->
+            <div class="mb-3">
+                {{ form.order.label_tag }}
+                {{ form.order|add_class:"form-control" }}
+                <small class="text-muted">Section order in the newsletter (1 = first section)</small>
+                {{ form.order.errors }}
+            </div>
+
+            <button type="submit" class="btn btn-success">Add Section</button>
+            <a href="{% url 'newsletter:preview_newsletter' newsletter.id %}" class="btn btn-primary ms-2">Preview Newsletter</a>
+        </form>
+
+        <hr>
+        <h4>Existing Sections</h4>
+        {% for sec in sections %}
+            <div class="mb-3 p-3 border rounded shadow-sm" style="background:#f9fafb;">
+                {% if sec.heading %}
+                    <strong style="font-size:1.1em;">{{ sec.heading }}</strong>
+                {% endif %}
+                <div class="mt-2" style="font-size:16px; line-height:1.7; color:#333;">
+                    {{ sec.content|safe }}
+                </div>
+                {% if sec.image %}
+                    <img src="{{ sec.image.url }}" class="img-fluid mt-2 rounded" alt="{{ sec.heading|default:'Section Image' }}">
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No sections added yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

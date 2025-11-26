@@ -1,0 +1,40 @@
+{% extends 'base_admin.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card p-4 mx-auto" style="max-width: 700px;">
+        <h2 class="mb-4 text-center">Create Newsletter</h2>
+
+        <form method="POST" action="{% url 'newsletter:create_newsletter' %}">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="mb-3">
+                {{ form.title.label_tag }}
+                {{ form.title|add_class:"form-control" }}
+                {{ form.title.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.volume.label_tag }}
+                {{ form.volume|add_class:"form-control" }}
+                {{ form.volume.errors }}
+            </div>
+
+           <div class="mb-3">
+                {{ form.main_content.label_tag }}
+                {{ form.main_content|add_class:"form-control" }}
+                <small class="text-muted">You can type plain text or HTML. HTML will be rendered in the preview.</small>
+            </div>
+
+
+            <button class="btn btn-primary w-100">Continue</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

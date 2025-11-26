@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import os
 
 class Article(models.Model):
     title = models.CharField(max_length=200)
@@ -8,13 +9,18 @@ class Article(models.Model):
     full_description = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='article_images/', blank=True, null=True)
+    audio_file = models.FileField(upload_to='article_audio/', blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
+    is_published = models.BooleanField(default=True)  # <-- add this
 
     class Meta:
         ordering = ['-date_posted']
 
     def __str__(self):
         return self.title
+
+    def audio_exists(self):
+        return bool(self.audio_file)
 
 
 class Comment(models.Model):
