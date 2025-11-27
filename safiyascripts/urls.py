@@ -41,8 +41,8 @@ urlpatterns = [
     path('comments/', include('comments.urls', namespace='comments')),  # <-- our new app
     path('newsletter/', include(('newsletter.urls', 'newsletter'), namespace='newsletter')),
 
-    path("<str:model_name>/<int:pk>/", universal_detail, name="universal_detail")
-
+    path("<str:model_name>/<int:pk>/", universal_detail, name="universal_detail"),
+    path('backup/', include('backup.urls')),
 ]
 
 from django.conf import settings

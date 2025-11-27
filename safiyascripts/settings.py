@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'contact',
     'comments',  # <-- Add the new comments app here
     'newsletter',
+    'backup',
 ]
 
 SITE_ID = 1

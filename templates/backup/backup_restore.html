@@ -1,0 +1,114 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Backup & Restore | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Backup & Restore</h2>
+
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Backup -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><strong>Create Backup</strong></div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'backup:backup' %}" id="backupForm">
+                        {% csrf_token %}
+                        {{ backup_form.apps.label_tag }}
+                        {{ backup_form.apps }}
+                        <button type="submit" name="do_backup" class="btn btn-primary mt-3">
+                            Download Backup ZIP
+                        </button>
+
+                        <!-- Progress bar -->
+                        <div class="progress mt-3" style="height: 20px; display:none;" id="backupProgress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                0%
+                            </div>
+                        </div>
+
+                        <p class="form-text text-muted mt-2">
+                            Full backup of database and media. Leave app labels empty to backup all.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restore -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><strong>Restore Backup</strong></div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'backup:restore' %}" enctype="multipart/form-data" id="restoreForm">
+                        {% csrf_token %}
+                        {{ restore_form.zip_file.label_tag }}
+                        {{ restore_form.zip_file }}
+                        <button type="submit" name="do_restore" class="btn btn-danger mt-3">
+                            Upload & Restore
+                        </button>
+
+                        <!-- Progress bar -->
+                        <div class="progress mt-3" style="height: 20px; display:none;" id="restoreProgress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                0%
+                            </div>
+                        </div>
+
+                        <p class="form-text text-muted mt-2">
+                            Upload ZIP from backup tool to restore database and media files.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'admin:index' %}" class="btn btn-secondary">← Back to Admin</a>
+    </div>
+</div>
+
+<!-- JavaScript to animate progress bars -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    function animateProgress(progressBarId) {
+        const progressContainer = document.getElementById(progressBarId);
+        const bar = progressContainer.querySelector('.progress-bar');
+        progressContainer.style.display = 'block';
+        let width = 0;
+        const interval = setInterval(() => {
+            if(width >= 90) { // stop at 90%, will complete when server responds
+                clearInterval(interval);
+            } else {
+                width += 1;
+                bar.style.width = width + '%';
+                bar.innerText = width + '%';
+            }
+        }, 100);
+    }
+
+    const backupForm = document.getElementById('backupForm');
+    const restoreForm = document.getElementById('restoreForm');
+
+    backupForm.addEventListener('submit', () => {
+        animateProgress('backupProgress');
+    });
+
+    restoreForm.addEventListener('submit', () => {
+        animateProgress('restoreProgress');
+    });
+});
+</script>
+{% endblock %}

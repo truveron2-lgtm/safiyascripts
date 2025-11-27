@@ -7,6 +7,13 @@
 <div class="container my-5">
     <h2 class="text-center mb-4">Newsletter Subscribers</h2>
 
+    <!-- Add Subscriber Button -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'articles:add_subscriber' %}" class="btn btn-primary">
+            + Add Subscriber
+        </a>
+    </div>
+
     {% if subscribers %}
         <div class="card shadow-sm">
             <div class="card-body table-responsive">
@@ -16,6 +23,7 @@
                             <th>#</th>
                             <th>Email</th>
                             <th>Date Subscribed</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -24,6 +32,13 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ subscriber.email }}</td>
                             <td>{{ subscriber.created_at|date:"M d, Y h:i A" }}</td>
+                            <td>
+                                <a href="{% url 'articles:delete_subscriber' subscriber.id %}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this subscriber?');">
+                                    Delete
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -53,6 +68,7 @@
                 </ul>
             </nav>
         </div>
+
     {% else %}
         <div class="alert alert-info text-center mt-4">
             No subscribers yet.

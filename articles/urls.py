@@ -13,6 +13,10 @@ urlpatterns = [
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
     path('subscribers/', views.subscribers_list, name='subscribers_list'),
     path("article/<int:pk>/regen-audio/", views.regenerate_audio, name="regenerate_audio"),
+    path('subscribers/add/', views.add_subscriber, name='add_subscriber'),
+    path('subscribers/<int:pk>/delete/', views.delete_subscriber, name='delete_subscriber'),
+
+
 
 
     # ✅ Public pages

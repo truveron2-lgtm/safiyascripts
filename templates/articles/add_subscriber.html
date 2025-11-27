@@ -1,0 +1,27 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block title %}Add Subscriber | SafiyaScripts{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Add New Subscriber</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+
+                <button type="submit" class="btn btn-success">Save Subscriber</button>
+                <a href="{% url 'articles:subscribers_list' %}" class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

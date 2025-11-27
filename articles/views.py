@@ -409,3 +409,32 @@ def admin_reply_comment(request, pk):
 
     return redirect('articles:article_detail', pk=article.pk)
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import SubscriptionForm
+from .models import Subscriber
+
+def add_subscriber(request):
+    if request.method == 'POST':
+        form = SubscriptionForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            if Subscriber.objects.filter(email=email).exists():
+                messages.warning(request, "This email is already subscribed.")
+            else:
+                form.save()
+                messages.success(request, "Subscriber added successfully!")
+                return redirect('articles:subscribers_list')
+    else:
+        form = SubscriptionForm()
+
+    return render(request, 'articles/add_subscriber.html', {'form': form})
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
+def delete_subscriber(request, pk):
+    subscriber = get_object_or_404(Subscriber, pk=pk)
+    subscriber.delete()
+    messages.success(request, "Subscriber deleted successfully.")
+    return redirect('articles:subscribers_list')
