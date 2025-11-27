@@ -64,6 +64,8 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+# settings.py
+SITE_URL = "https://www.safiyascripts.com"  # or "http://localhost:8000" for dev
 
 import os
 from pathlib import Path
@@ -162,6 +164,7 @@ DATABASES = {
 
 # Add SSL options manually if not already present
 DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+
 
 
 # Password validation

@@ -9,6 +9,8 @@
         .section img { max-width: 100%; height: auto; margin-top: 10px; display: block; }
         .section a { color: #0056b3; text-decoration: none; }
         hr { border: 0; border-top: 1px solid #ddd; }
+        .unsubscribe { font-size: 12px; color: #888; margin-top: 20px; }
+        .unsubscribe a { color: #888; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -45,6 +47,28 @@
             {% endif %}
         </div>
     {% endfor %}
+
+    <hr>
+    <p style="font-size:16px; color:#333; line-height:1.6; margin-top:20px;">
+    You are receiving this newsletter because you subscribed to SafiyaScripts.
+    If you no longer wish to receive these emails, you can safely 
+    <a href="{{ unsubscribe_url }}" 
+       style="
+           font-size:18px; 
+           font-weight:bold; 
+           color:#d9534f; 
+           text-decoration:none; 
+           background-color:#f8d7da; 
+           padding:8px 15px; 
+           border-radius:5px;
+           display:inline-block;
+       ">
+        Unsubscribe from Newsletter
+    </a>.
+</p>
+
+
+
 
 </div>
 </body>

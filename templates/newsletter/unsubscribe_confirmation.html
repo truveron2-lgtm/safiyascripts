@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card shadow-sm p-4" style="max-width: 500px; width: 100%; text-align: center; border-radius: 12px;">
+        {% if subscriber %}
+            {% if not confirmed %}
+                <h3 class="mb-3">Hi {{ subscriber.email }}</h3>
+                <p class="mb-4">Are you sure you want to unsubscribe from our newsletter?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Unsubscribe Me</button>
+                    <a href="/" class="btn btn-secondary">Cancel</a>
+                </form>
+            {% else %}
+                <h3 class="text-success mb-3">{{ subscriber.email }} has been unsubscribed successfully.</h3>
+                <p class="mb-4">You will no longer receive our newsletter.</p>
+                <a href="/" class="btn btn-primary">Back to Home</a>
+            {% endif %}
+        {% else %}
+            <h3 class="text-danger mb-3">Unsubscription Failed</h3>
+            <p class="mb-4">The link might be invalid or expired.</p>
+            <a href="/" class="btn btn-primary">Back to Home</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

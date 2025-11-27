@@ -10,6 +10,7 @@ from django.utils import timezone
 from .models import Newsletter, NewsletterSection
 from .forms import NewsletterForm, NewsletterSectionForm
 from articles.models import Subscriber
+from .utils import generate_unsubscribe_url
 
 import threading
 import time
@@ -31,7 +32,8 @@ def _send_newsletter_job(newsletter_id):
     if not newsletter:
         return
 
-    subscribers = list(Subscriber.objects.all())
+    # Only send to active subscribers
+    subscribers = list(Subscriber.objects.filter(is_active=True))
     total = len(subscribers)
     if total == 0:
         with SEND_LOCK:
@@ -56,7 +58,8 @@ def _send_newsletter_job(newsletter_id):
         try:
             html_content = render_to_string('newsletter/newsletter_email.html', {
                 'newsletter': newsletter,
-                'subscriber': sub
+                'subscriber': sub,
+                'unsubscribe_url': generate_unsubscribe_url(sub, request=None)
             })
             text_content = strip_tags(html_content)
 
@@ -74,7 +77,6 @@ def _send_newsletter_job(newsletter_id):
                 if section.image:
                     image_path = section.image.path
                     if os.path.exists(image_path):
-                        # Determine MIME type
                         mime_type, _ = mimetypes.guess_type(image_path)
                         if not mime_type:
                             mime_type = "image/jpeg"
@@ -248,3 +250,34 @@ def sending_progress(request, newsletter_id):
 def sent_confirmation(request, newsletter_id):
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
     return render(request, 'newsletter/send_finished.html', {'newsletter': newsletter})
+
+
+# newsletter/views.py
+# newsletter/views.py
+from django.shortcuts import render, get_object_or_404
+from articles.models import Subscriber
+from .utils import verify_unsubscribe_token
+
+def unsubscribe_newsletter(request, uidb64):
+    """
+    Unsubscribe a subscriber after confirming.
+    - GET: show confirmation page
+    - POST: mark subscriber as inactive
+    """
+    subscriber_id = verify_unsubscribe_token(uidb64)
+    subscriber = None
+    confirmed = False  # tracks if user has confirmed
+
+    if subscriber_id:
+        subscriber = get_object_or_404(Subscriber, id=subscriber_id)
+        
+        if request.method == "POST":
+            # User confirmed unsubscription
+            subscriber.is_active = False
+            subscriber.save()
+            confirmed = True
+
+    return render(request, 'newsletter/unsubscribe_confirmation.html', {
+        'subscriber': subscriber,
+        'confirmed': confirmed
+    })

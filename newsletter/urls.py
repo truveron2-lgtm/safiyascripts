@@ -11,4 +11,8 @@ urlpatterns = [
     path('<int:newsletter_id>/start-send/', views.start_send_background, name='start_send_background'),
     path('<int:newsletter_id>/send-progress/', views.sending_progress, name='sending_progress'),
     path('<int:newsletter_id>/sent/', views.sent_confirmation, name='sent_confirmation'),
+    #path('unsubscribe/<str:token>/', views.unsubscribe, name='unsubscribe'),
+     # 🔹 Add this for unsubscribe
+    # newsletter/urls.py
+    path('unsubscribe/<str:uidb64>/', views.unsubscribe_newsletter, name='unsubscribe_newsletter'),
 ]
